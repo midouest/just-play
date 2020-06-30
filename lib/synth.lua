@@ -38,6 +38,10 @@ function Synth:set_enabled(enabled)
   crow.ii.jf.mode(mode)
 end
 
+function Synth:set_god_mode(mode)
+  crow.ii.jf.god_mode(mode)
+end
+
 function Synth:all_notes_off()
   crow.ii.jf.play_voice(0, 0, 0)
   self.voice = Voice.new(NUM_VOICES, Voice.MODE_LRU)
