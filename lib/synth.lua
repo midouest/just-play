@@ -4,7 +4,7 @@ local Synth = {}
 Synth.__index = Synth
 
 local NUM_VOICES = 6
-local NOTE_OFFSET_V = -4
+local NOTE_OFFSET_V = -5 -- middle c offset (c3 convention)
 
 -- Convert MIDI note to v/oct
 -- @param n MIDI note (0-127)
@@ -22,12 +22,9 @@ function Synth.new()
 
   local synth = setmetatable({
     voice=Voice.new(NUM_VOICES, Voice.MODE_LRU),
-    pitch_min=0,
-    pitch_max=10,
-    velocity_min=0,
-    velocity_max=10,
-    cc_min=0,
-    cc_max=10
+    pitch_cv_offset=-5,
+    velocity_cv_offset=0,
+    cc_cv_offset=0,
   }, Synth)
   synth:set_enabled(true)
   return synth
@@ -37,30 +34,25 @@ end
 -- @param enabled true or false
 function Synth:set_enabled(enabled)
   local mode = enabled and 1 or 0
-  self.all_notes_off()
+  self:all_notes_off()
   crow.ii.jf.mode(mode)
 end
 
 function Synth:all_notes_off()
   crow.ii.jf.play_voice(0, 0, 0)
+  self.voice = Voice.new(NUM_VOICES, Voice.MODE_LRU)
 end
 
-function Synth:set_pitch_range(min, max)
-  self.pitch_min=min
-  self.pitch_max=max
-  -- TODO: rescale existing output?
+function Synth:set_pitch_cv_offset(offset)
+  self.pitch_cv_offset=offset
 end
 
-function Synth:set_velocity_range(min, max)
-  self.velocity_min=min
-  self.velocity_max=max
-  -- TODO: rescale existing output?
+function Synth:set_velocity_cv_offset(offset)
+  self.velocity_cv_offset=offset
 end
 
-function Synth:set_cc_range(min, max)
-  self.cc_min=min
-  self.cc_max=max
-  -- TODO: rescale existing output?
+function Synth:set_cc_cv_offset(offset)
+  self.cc_cv_offset=offset
 end
 
 -- Play a note on Just Friends
@@ -76,8 +68,8 @@ function Synth:note_on(n, v)
 
   crow.ii.jf.play_voice(slot.id, jf_n, jf_v)
   crow.output[1]()
-  crow.output[2].volts = util.linlin(0, 127, self.pitch_min, self.pitch_max, n)
-  crow.output[3].volts = util.linlin(0, 127, self.velocity_min, self.velocity_max, v)
+  crow.output[2].volts = n2v(n) + self.pitch_cv_offset
+  crow.output[3].volts = cc2v(v) + self.velocity_cv_offset
 
   return slot.id
 end
@@ -104,7 +96,7 @@ end
 -- Output a control change value with Crow
 -- @param val MIDI CC value
 function Synth:control_change(val)
-  crow.output[4].volts = util.linlin(0, 127, self.cc_min, self.cc_max, val)
+  crow.output[4].volts = cc2v(val) + self.cc_cv_offset
 end
 
 return Synth
