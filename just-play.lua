@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v1.1.0 @midouest
+-- v1.1.1 @midouest
 --
 -- crow out 1 = trig
 -- crow out 2 = pitch
@@ -57,7 +57,7 @@ function init()
 
   params:add{
     type='number',
-    id='cc_num',
+    id='cc',
     name='cc#',
     min=1,
     max=127,
