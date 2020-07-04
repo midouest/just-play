@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v1.1.1 @midouest
+-- v1.2.0 @midouest
 --
 -- crow out 1 = trig
 -- crow out 2 = pitch
@@ -109,6 +109,17 @@ function init()
     options={'on', 'off'},
     action=function(val)
       synth:set_enabled(val == 1)
+      params:write()
+    end
+  }
+
+  params:add{
+    type='option',
+    id='god_mode',
+    name='god mode',
+    options={'440hz', '432hz'},
+    action=function(val)
+      synth:set_god_mode(val - 1)
       params:write()
     end
   }
