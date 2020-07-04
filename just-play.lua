@@ -25,10 +25,7 @@ function init()
     min=1,
     max=4,
     default=1,
-    action=function(val)
-      setup_midi(val)
-      params:write()
-    end
+    action=function(val) setup_midi(val) end
   }
 
   params:add{
@@ -39,10 +36,7 @@ function init()
     max=16,
     default=0,
     formatter=function(p) return p.value == 0 and 'any' or p.value end,
-    action=function(val)
-      synth:all_notes_off()
-      params:write()
-    end
+    action=function(val) synth:all_notes_off() end
   }
 
   params:add{
@@ -52,7 +46,6 @@ function init()
     min=0,
     max=48,
     default=2,
-    action=function(val) params:write() end
   }
 
   params:add{
@@ -62,7 +55,6 @@ function init()
     min=1,
     max=127,
     default=1,
-    action=function(val) params:write() end
   }
 
   params:add_separator('crow')
@@ -72,10 +64,7 @@ function init()
     id='pitch_range',
     name='pitch range',
     options={'0-10V', '+/-5V'},
-    action=function(val)
-      synth:set_pitch_cv_offset(val == 1 and 0 or -5)
-      params:write()
-    end
+    action=function(val) synth:set_pitch_cv_offset(val == 1 and 0 or -5) end
   }
 
   params:add{
@@ -83,10 +72,7 @@ function init()
     id='velocity_range',
     name='velocity range',
     options={'0-10V', '+/-5V'},
-    action=function(val)
-      synth:set_velocity_cv_offset(val == 1 and 0 or -5)
-      params:write()
-    end
+    action=function(val) synth:set_velocity_cv_offset(val == 1 and 0 or -5) end
   }
 
   params:add{
@@ -94,10 +80,7 @@ function init()
     id='cc_range',
     name='cc range',
     options={'0-10V', '+/-5V'},
-    action=function(val)
-      synth:set_cc_cv_offset(val == 1 and 0 or -5)
-      params:write()
-    end
+    action=function(val) synth:set_cc_cv_offset(val == 1 and 0 or -5) end
   }
 
   params:add_separator('just friends')
@@ -107,10 +90,7 @@ function init()
     id='enabled',
     name='synth mode',
     options={'on', 'off'},
-    action=function(val)
-      synth:set_enabled(val == 1)
-      params:write()
-    end
+    action=function(val) synth:set_enabled(val == 1) end
   }
 
   params:add{
@@ -118,13 +98,9 @@ function init()
     id='god_mode',
     name='god mode',
     options={'440hz', '432hz'},
-    action=function(val)
-      synth:set_god_mode(val - 1)
-      params:write()
-    end
+    action=function(val) synth:set_god_mode(val - 1) end
   }
 
-  params:read()
   params:bang()
   redraw()
 end
