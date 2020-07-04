@@ -3,7 +3,7 @@ local Voice = require 'voice'
 local Synth = {}
 Synth.__index = Synth
 
-local NUM_VOICES = 6
+local NUM_VOICES = 4
 local NOTE_OFFSET_V = -5 -- middle c offset (c3 convention)
 
 -- Convert MIDI note to v/oct
@@ -36,6 +36,9 @@ function Synth:set_enabled(enabled)
   local mode = enabled and 1 or 0
   self:all_notes_off()
   crow.ii.jf.mode(mode)
+  crow.send('ii.wsyn.voices(4)')
+  -- TODO: hard-coded to ar mode until I can figure out how to release a note
+  crow.send('ii.wsyn.ar_mode(1)')
 end
 
 function Synth:set_god_mode(mode)
@@ -44,6 +47,7 @@ end
 
 function Synth:all_notes_off()
   crow.ii.jf.play_voice(0, 0, 0)
+  crow.send('ii.wsyn.play_voice(0, 0, 0)')
   self.voice = Voice.new(NUM_VOICES, Voice.MODE_LRU)
 end
 
@@ -71,6 +75,7 @@ function Synth:note_on(n, v)
   self.voice:push(n, slot)
 
   crow.ii.jf.play_voice(slot.id, jf_n, jf_v)
+  crow.send('ii.wsyn.play_voice('..slot.id..','..jf_n..','..jf_v..')')
   crow.output[1]()
   crow.output[2].volts = n2v(n) + self.pitch_cv_offset
   crow.output[3].volts = cc2v(v) + self.velocity_cv_offset
@@ -85,6 +90,8 @@ function Synth:note_off(n)
   local slot = self.voice:pop(n)
   if slot ~= nil then
     crow.ii.jf.play_voice(slot.id, 0, 0)
+    -- TODO: how to release a note on wsyn?
+    -- crow.send('ii.wsyn.play_voice('..slot.id..','..n..',0)')
     self.voice:release(slot)
     return slot.id
   end
