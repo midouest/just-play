@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v1.2.0 @midouest
+-- v1.2.1 @midouest
 --
 -- crow out 1 = trig
 -- crow out 2 = pitch
@@ -216,15 +216,15 @@ function redraw_voice(i)
     screen.level(15)
   end
 
-  local x = (i - 1) * 18 + 21
+  local x = (i - 1) * 18 + 29
   screen.move(x, 8)
   local text = note_to_text(note)
-  screen.text(text)
+  screen.text_center(text)
 
   screen.line_width(16)
-  screen.move(x + 8, 62)
+  screen.move(x, 62)
   local y = util.linlin(0, 127, 62, 10, vel)
-  screen.line(x + 8, y)
+  screen.line(x, y)
   screen.stroke()
 end
 
