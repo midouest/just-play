@@ -105,6 +105,10 @@ function init()
   redraw()
 end
 
+function cleanup()
+  synth:set_enabled(false)
+end
+
 function setup_midi(input)
   midi.cleanup()
   m = midi.connect(input)
