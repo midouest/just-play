@@ -37,8 +37,6 @@ function Synth:set_enabled(enabled)
   self:all_notes_off()
   crow.ii.jf.mode(mode)
   crow.send('ii.wsyn.voices(4)')
-  -- TODO: hard-coded to ar mode until I can figure out how to release a note
-  crow.send('ii.wsyn.ar_mode(1)')
 end
 
 function Synth:set_god_mode(mode)
@@ -89,9 +87,9 @@ end
 function Synth:note_off(n)
   local slot = self.voice:pop(n)
   if slot ~= nil then
-    crow.ii.jf.play_voice(slot.id, 0, 0)
-    -- TODO: how to release a note on wsyn?
-    -- crow.send('ii.wsyn.play_voice('..slot.id..','..n..',0)')
+    local jf_v = n2v(n) + NOTE_OFFSET_V
+    crow.ii.jf.play_voice(slot.id, jf_v, 0)
+    crow.send('ii.wsyn.play_voice('..slot.id..','..jf_v..',0)')
     self.voice:release(slot)
     return slot.id
   end

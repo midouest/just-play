@@ -104,6 +104,14 @@ function init()
   params:add_separator('wsyn')
 
   params:add{
+    type='option',
+    id='wsyn_ar_mode',
+    name='ar mode',
+    options={'off', 'on'},
+    action=function(val) crow.send('ii.wsyn.ar_mode('..(val - 1)..')') end
+  }
+
+  params:add{
     type='control',
     id='wsyn_curve',
     name='curve',
