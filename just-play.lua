@@ -7,6 +7,8 @@
 -- crow out 3 = velocity
 -- crow out 4 = cc
 
+local MusicUtil = require 'musicutil'
+
 local Synth = include('lib/synth')
 
 local m
@@ -216,14 +218,6 @@ function redraw_voice(i)
   screen.stroke()
 end
 
-local pitch_names = {'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'}
 function note_to_text(note)
-  if note == nil then
-    return '--'
-  end
-
-  local pitch = note % 12 + 1
-  local name = pitch_names[pitch]
-  local octave = math.floor(note / 12) - 1
-  return tostring(name)..tostring(octave)
+  return note ~= nil and MusicUtil.note_num_to_name(note, true) or '--'
 end
