@@ -101,6 +101,14 @@ function init()
     action=function(val) synth:set_god_mode(val - 1) end
   }
 
+  params:add{
+    type='control',
+    id='velocity_scale',
+    name='velocity scale',
+    controlspec=controlspec.new(0, 1, 'lin', 0, 0.33),
+    action=function(val) synth:set_velocity_scale(val) end
+  }
+
   params:bang()
   redraw()
 end

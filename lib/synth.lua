@@ -17,7 +17,6 @@ function cc2v(cc) return (cc / 127) * 10 end
 
 -- Initialize the Just Friends synth
 function Synth.new()
-  crow.ii.pullup(true)
   crow.output[1].action = "pulse(0.005, 10)"
 
   local synth = setmetatable({
@@ -25,6 +24,7 @@ function Synth.new()
     pitch_cv_offset=-5,
     velocity_cv_offset=0,
     cc_cv_offset=0,
+    velocity_scale=1,
   }, Synth)
   synth:set_enabled(true)
   return synth
@@ -59,13 +59,17 @@ function Synth:set_cc_cv_offset(offset)
   self.cc_cv_offset=offset
 end
 
+function Synth:set_velocity_scale(scale)
+  self.velocity_scale=scale
+end
+
 -- Play a note on Just Friends
 -- @param n MIDI note
 -- @param v MIDI velocity
 -- @return assigned voice index
 function Synth:note_on(n, v)
   local jf_n = n2v(n) + NOTE_OFFSET_V
-  local jf_v = cc2v(v)
+  local jf_v = cc2v(v) * self.velocity_scale
 
   local slot = self.voice:get()
   self.voice:push(n, slot)
