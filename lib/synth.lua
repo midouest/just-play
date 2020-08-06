@@ -25,6 +25,7 @@ function Synth.new()
     velocity_cv_offset=0,
     cc_cv_offset=0,
     velocity_scale=1,
+    pitch_drift=0,
   }, Synth)
   synth:set_enabled(true)
   return synth
@@ -63,6 +64,10 @@ function Synth:set_velocity_scale(scale)
   self.velocity_scale=scale
 end
 
+function Synth:set_pitch_drift(drift)
+  self.pitch_drift=drift
+end
+
 -- Play a note on Just Friends
 -- @param n MIDI note
 -- @param v MIDI velocity
@@ -71,7 +76,8 @@ end
 function Synth:note_on(n, v, id)
   id = id or n
 
-  local jf_n = n2v(n) + NOTE_OFFSET_V
+  local drift = (math.random(0, 2) - 1) * self.pitch_drift
+  local jf_n = n2v(n + drift) + NOTE_OFFSET_V
   local jf_v = cc2v(v) * self.velocity_scale
 
   local slot = self.voice:get()

@@ -125,6 +125,14 @@ function init()
     action=function(val) synth:set_velocity_scale(val) end
   }
 
+  params:add{
+    type='control',
+    id='pitch_drift',
+    name='pitch drift',
+    controlspec=controlspec.new(0, 1, 'lin', 0, 0),
+    action=function(val) synth:set_pitch_drift(val) end
+  }
+
   params:add_separator('grid')
 
   params:add{
