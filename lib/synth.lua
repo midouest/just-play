@@ -25,6 +25,8 @@ function Synth.new()
     velocity_cv_offset=0,
     cc_cv_offset=0,
     velocity_scale=1,
+    unison=1,
+    detune=0
   }, Synth)
   synth:set_enabled(true)
   return synth
@@ -63,6 +65,16 @@ function Synth:set_velocity_scale(scale)
   self.velocity_scale=scale
 end
 
+function Synth:set_unison(unison)
+  self.unison=unison
+  self:all_notes_off()
+  self.voice = Voice.new(NUM_VOICES / self.unison, Voice.MODE_LRU)
+end
+
+function Synth:set_detune(val)
+  self.detune = val
+end
+
 -- Play a note on Just Friends
 -- @param n MIDI note
 -- @param v MIDI velocity
@@ -78,6 +90,11 @@ function Synth:note_on(n, v, id)
   self.voice:push(id, slot)
 
   crow.ii.jf.play_voice(slot.id, jf_n, jf_v)
+  for i=2,self.unison do
+    local offset = (i - 1) * (5 - self.unison)
+    local detune = n2v(self.detune) * ((i * 2) - 5)
+    crow.ii.jf.play_voice(slot.id + offset, jf_n + detune, jf_v)
+  end
   crow.output[1]()
   crow.output[2].volts = n2v(n) + self.pitch_cv_offset
   crow.output[3].volts = cc2v(v) + self.velocity_cv_offset
@@ -92,6 +109,10 @@ function Synth:note_off(id)
   local slot = self.voice:pop(id)
   if slot ~= nil then
     crow.ii.jf.play_voice(slot.id, 0, 0)
+    for i=2,self.unison do
+      local offset = (i - 1) * (5 - self.unison)
+      crow.ii.jf.play_voice(slot.id + offset, 0, 0)
+    end
     self.voice:release(slot)
     return slot.id
   end

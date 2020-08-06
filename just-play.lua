@@ -125,6 +125,25 @@ function init()
     action=function(val) synth:set_velocity_scale(val) end
   }
 
+  params:add{
+    type='number',
+    id='unison',
+    name='unison',
+    min=1,
+    max=3,
+    step=1,
+    default=1,
+    action=function(val) synth:set_unison(val) end
+  }
+
+  params:add{
+    type='control',
+    id='detune',
+    name='detune',
+    controlspec=controlspec.new(0, 1, 'lin', 0, 0),
+    action=function(val) synth:set_detune(val) end
+  }
+
   params:add_separator('grid')
 
   params:add{
