@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v1.4.0 @midouest
+-- v1.4.1 @midouest
 --
 -- crow out 1 = trig
 -- crow out 2 = pitch

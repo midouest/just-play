@@ -16,7 +16,7 @@ GridScale.CHROMATIC_MASK = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 -- @param octave_level LED brightness level for octaves of the root note
 function GridScale.generate_grid(scale, diatonic_level, octave_level)
   local scale_mask = GridScale.CHROMATIC_MASK
-  if scale ~= #MusicUtil.SCALES then
+  if scale ~= #musicutil.SCALES then
     local scale_array = musicutil.generate_scale(0, scale)
     scale_mask = generate_scale_mask(scale_array)
   end
