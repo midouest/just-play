@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v1.3.0 @midouest
+-- v1.4.0 @midouest
 --
 -- crow out 1 = trig
 -- crow out 2 = pitch
@@ -11,9 +11,7 @@ local MusicUtil = require 'musicutil'
 local TabUtil = require 'tabutil'
 
 local Synth = include('lib/synth')
-
--- constants
-local GRID_ROW_SEMITONES = 5
+local GridScale = include('lib/grid_scale')
 
 -- state variables
 local midi_device
@@ -141,32 +139,42 @@ function init()
   }
 
   params:add{
-    type='control',
+    type='number',
     id='grid_velocity',
     name='fixed velocity',
-    controlspec=controlspec.MIDIVELOCITY,
+    min=0,
+    max=127,
+    step=1,
+    default=64,
   }
 
   params:add{
-    type='control',
+    type='number',
     id='grid_min_note',
     name='minimum note',
-    controlspec=controlspec.new(0, 127, 'lin', 1, 36),
+    min=0,
+    max=127,
+    step=1,
+    default=48,
     formatter=function(control)
       return MusicUtil.note_num_to_name(control:get(), true)
     end
   }
 
   params:add{
-    type='control',
+    type='number',
     id='grid_scale',
     name='scale',
-    controlspec=controlspec.new(0, #MusicUtil.SCALES - 1, 'lin', 1, 1),
+    min=1,
+    max=#MusicUtil.SCALES,
+    step=1,
+    default=1,
     formatter=function(control)
       local val = control:get()
-      return val == 0 and 'off' or MusicUtil.SCALES[val].name
+      return MusicUtil.SCALES[val].name
     end,
-    action=function()
+    action=function(val)
+      grid_scale = GridScale.generate_grid(val, 3, 4)
       grid_redraw()
     end
   }
@@ -201,24 +209,15 @@ function key(n, z)
 end
 
 function grid_key(x, y, z)
-  local note = grid_to_note(x, y)
+  local id = tostring(x)..tostring(y)
 
   if z == 1 then
-    for _, voice in ipairs(state) do
-      if voice.note == note then
-        return
-      end
-    end
-
     local vel = params:get('grid_velocity')
-    local index = synth:note_on(note, vel)
-    state[index]={note=note, velocity=vel}
+    local note = grid_to_note(x, y)
+    synth:note_on(note, vel, id)
     grid_keys[y][x] = true
   else
-    local index = synth:note_off(note)
-    if index ~= nil then
-      state[index].note = nil
-    end
+    synth:note_off(id)
     grid_keys[y][x] = false
   end
   grid_redraw()
@@ -226,7 +225,7 @@ end
 
 
 function grid_to_note(x, y)
-  return ((8 - y) * GRID_ROW_SEMITONES) + x - 1 + params:get('grid_min_note')
+  return ((8 - y) * GridScale.ROW_OFFSET) + x - 1 + params:get('grid_min_note')
 end
 
 function midi_to_synth(data)
@@ -322,7 +321,8 @@ function grid_redraw()
 
   for y = 1,8 do
     for x = 1,16 do
-      grid_device:led(x, y, grid_keys[y][x] and 15 or 0)
+      local base = grid_scale[y][x]
+      grid_device:led(x, y, grid_keys[y][x] and 15 or base)
     end
   end
 

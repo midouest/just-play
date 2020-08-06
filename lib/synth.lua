@@ -66,13 +66,16 @@ end
 -- Play a note on Just Friends
 -- @param n MIDI note
 -- @param v MIDI velocity
+-- @param id
 -- @return assigned voice index
-function Synth:note_on(n, v)
+function Synth:note_on(n, v, id)
+  id = id or n
+
   local jf_n = n2v(n) + NOTE_OFFSET_V
   local jf_v = cc2v(v) * self.velocity_scale
 
   local slot = self.voice:get()
-  self.voice:push(n, slot)
+  self.voice:push(id, slot)
 
   crow.ii.jf.play_voice(slot.id, jf_n, jf_v)
   crow.output[1]()
@@ -83,10 +86,10 @@ function Synth:note_on(n, v)
 end
 
 -- Stop playing a note on Just Friends
--- @param n MIDI note
+-- @param id MIDI note
 -- @returns assigned voice index
-function Synth:note_off(n)
-  local slot = self.voice:pop(n)
+function Synth:note_off(id)
+  local slot = self.voice:pop(id)
   if slot ~= nil then
     crow.ii.jf.play_voice(slot.id, 0, 0)
     self.voice:release(slot)

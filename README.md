@@ -8,6 +8,7 @@ Play Just Friends in synth mode with MIDI (6-voice polyphony)
 - [crow](https://monome.org/docs/crow/)
 - [just friends](https://www.whimsicalraps.com/products/just-friends?variant=5586981781533) connected to crow via i2c
 - a MIDI controller
+- [grid](https://monome.org/docs/grid/) (optional)
 
 ## documentation
 
