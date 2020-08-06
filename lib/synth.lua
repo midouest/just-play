@@ -28,12 +28,18 @@ function Synth.new()
   }, Synth)
   synth:set_enabled(true)
 
-  crow.input[1].mode('stream', 0.01)
-  crow.input[1].stream = function(v)
-    crow.ii.jf.transpose(v)
-  end
-
   return synth
+end
+
+function set_crow_transpose_enabled(enabled)
+  if enabled then
+    crow.input[1].mode('stream', 0.01)
+    crow.input[1].stream = function(v)
+      crow.ii.jf.transpose(v)
+    end
+  else
+    crow.input[1].mode('none')
+  end
 end
 
 -- Enable or disable Just Friends synth mode
@@ -42,6 +48,7 @@ function Synth:set_enabled(enabled)
   local mode = enabled and 1 or 0
   self:all_notes_off()
   crow.ii.jf.mode(mode)
+  set_crow_transpose_enabled(enabled)
 end
 
 function Synth:set_god_mode(mode)
