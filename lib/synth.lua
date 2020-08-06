@@ -27,6 +27,12 @@ function Synth.new()
     velocity_scale=1,
   }, Synth)
   synth:set_enabled(true)
+
+  crow.input[1].mode('stream', 0.01)
+  crow.input[1].stream = function(v)
+    crow.ii.jf.transpose(v)
+  end
+
   return synth
 end
 
