@@ -83,57 +83,7 @@ function Config.init_crow(options)
 end
 
 function Config.init_grid(options)
-  params:add_separator("grid")
 
-  params:add{
-    type = "number",
-    id = "grid_device",
-    name = "device",
-    min = 1,
-    max = 4,
-    default = 1,
-    step = 1,
-    action = options.on_device,
-  }
-
-  params:add{
-    type = "number",
-    id = "grid_velocity",
-    name = "fixed velocity",
-    min = 0,
-    max = 127,
-    step = 1,
-    default = 64,
-  }
-
-  params:add{
-    type = "number",
-    id = "grid_min_note",
-    name = "minimum note",
-    min = 0,
-    max = 127,
-    step = 1,
-    default = 48,
-    formatter = function(control)
-      return MusicUtil.note_num_to_name(control:get(), true)
-    end,
-    action = options.on_min_note,
-  }
-
-  params:add{
-    type = "number",
-    id = "grid_scale",
-    name = "scale",
-    min = 1,
-    max = #MusicUtil.SCALES,
-    step = 1,
-    default = 1,
-    formatter = function(control)
-      local val = control:get()
-      return MusicUtil.SCALES[val].name
-    end,
-    action = options.on_scale,
-  }
 end
 
 return Config

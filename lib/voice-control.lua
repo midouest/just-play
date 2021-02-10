@@ -15,19 +15,21 @@ function VoiceControl.new(num_modules, num_voices)
 end
 
 function VoiceControl:_module(id)
-  return id // self._num_voices + 1
+  return (id - 1) // self._num_voices + 1
 end
 
 function VoiceControl:note_on(id)
   local slot = self._voice:get()
   self._voice:push(id, slot)
-  return self._module(slot.id), slot.id
+  return self:_module(slot.id), (slot.id - 1) % self._num_voices + 1
 end
 
 function VoiceControl:note_off(id)
   local slot = self._voice:pop(id)
   if slot ~= nil then
     self._voice:release(slot)
-    return self._module(slot.id), slot.id
+    return self:_module(slot.id), (slot.id - 1) % self._num_voices + 1
   end
 end
+
+return VoiceControl

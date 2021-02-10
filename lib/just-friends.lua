@@ -19,7 +19,7 @@ end
 ]]
 function JustFriends:_init()
   self._jf.mode(1)
-  self:all_notes_off()
+  self:all_voices_off()
 end
 
 -- Common interface ////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ end
     Disable Just Friends synth mode
 ]]
 function JustFriends:cleanup()
-  self:all_notes_off()
+  self:all_voices_off()
   self._jf.mode(0)
 end
 
