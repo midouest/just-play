@@ -5,11 +5,45 @@
 JustFriends.NUM_VOICES = 6 -- Maximum number of voices that can be assigned
 JustFriends.__index = JustFriends
 
+function JustFriends.init_params()
+  params:add_separator('just friends')
+
+  params:add{
+    type = 'option',
+    id = 'jf_god_mode',
+    name = 'god mode',
+    options = {'440hz', '432hz'},
+    action = function(val)
+      crow.ii.jf.god_mode(val - 1)
+    end,
+  }
+
+  params:add{
+    type = 'option',
+    id = 'jf_run_mode',
+    name = 'run mode',
+    options = {'off', 'on'},
+    action = function(val)
+      crow.ii.jf.run_mode(val - 1)
+    end,
+  }
+
+  params:add{
+    type = 'control',
+    id = 'jf_run',
+    name = "run",
+    controlspec = controlspec.new(-5, 5, 'lin', 0.1, 0, 'v'),
+    action = function(val)
+      crow.ii.jf.run(val)
+    end,
+  }
+end
+
 --[[
     Create a new reference to a Just Friends module connected via crow and i2c
 ]]
-function JustFriends.new(index)
-  local jf = setmetatable({_jf = crow.ii.jf[index]}, JustFriends)
+function JustFriends.new()
+  local jf = setmetatable({_jf = crow.ii.jf}, JustFriends)
   jf:_init()
   return jf
 end
@@ -21,8 +55,6 @@ function JustFriends:_init()
   self._jf.mode(1)
   self:all_voices_off()
 end
-
--- Common interface ////////////////////////////////////////////////////////////
 
 --[[
     Disable Just Friends synth mode
@@ -66,30 +98,7 @@ end
     @param volts pitch voltage to transpose each voice by
 ]]
 function JustFriends:pitchbend(volts)
-  self:voice_pitchbend(0, volts)
-end
-
---[[
-    Apply bitchbend to a single voice
-
-    @param index voice index to apply pitchbend to
-    @param volts pitch voltage to transpose the voice by
-]]
-function JustFriends:voice_pitchbend(index, volts)
-  self._jf.pitch(index, volts)
-end
-
--- Just Friends-specific interface /////////////////////////////////////////////
-
---[[
-    Enable or disable god mode
-
-    @param enabled true to set base frequency to 432hz, false to set base frequency
-                   back to 440hz
-]]
-function JustFriends:god_mode(enabled)
-  local mode = enabled and 1 or 0
-  self._jf.god_mode(mode)
+  self._jf.transpose(volts)
 end
 
 return JustFriends

@@ -1,3 +1,0 @@
-local Crow = {}
-
-return Crow

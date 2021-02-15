@@ -2,15 +2,15 @@ local MusicUtil = require('musicutil')
 
 local GridScale = include('lib/grid-scale')
 
-local Grid = {}
+local GridControl = {}
 
 local key_callback
 local keys
 local scale
 local device
 
-function Grid.init(callback)
-  key_callback = callback
+function GridControl.init(options)
+  key_callback = options.on_key
   keys = {}
 
   for y = 1, 8 do
@@ -20,12 +20,6 @@ function Grid.init(callback)
     end
     keys[y] = row
   end
-
-  Grid.init_params()
-end
-
-function Grid.init_params()
-
   params:add_separator("grid")
 
   params:add{
@@ -36,7 +30,7 @@ function Grid.init_params()
     max = 4,
     default = 1,
     step = 1,
-    action = Grid.connect,
+    action = GridControl.connect,
   }
 
   params:add{
@@ -76,7 +70,7 @@ function Grid.init_params()
     end,
     action = function(val)
       scale = GridScale.generate_grid(val, 3, 4)
-      Grid.redraw()
+      GridControl.redraw()
     end,
   }
 end
@@ -84,20 +78,20 @@ end
 local function handle_grid_key(x, y, z)
   keys[y][x] = z == 1
   key_callback(x, y, z)
-  Grid.redraw()
+  GridControl.redraw()
 end
 
-function Grid.connect(input)
+function GridControl.connect(input)
   grid.cleanup()
   device = grid.connect(input)
   device.key = handle_grid_key
 end
 
-function Grid.to_note(x, y)
+function GridControl.to_note(x, y)
   return ((8 - y) * GridScale.ROW_OFFSET) + x - 1 + params:get("grid_min_note")
 end
 
-function Grid.redraw()
+function GridControl.redraw()
   device:all(0)
 
   local notes = {}
@@ -123,4 +117,4 @@ function Grid.redraw()
   device:refresh()
 end
 
-return Grid
+return GridControl

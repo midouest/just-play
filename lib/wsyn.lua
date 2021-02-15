@@ -8,100 +8,88 @@ local function send(i, cmd)
   crow.send('ii.wsyn[' .. i .. '].' .. cmd)
 end
 
-function WSyn.init_params(i)
-  params:add_separator('wsyn ' .. i)
+local function param_v(id, name)
+  local name = name or id
+  params:add{
+    type = 'control',
+    id = 'wsyn_' .. id,
+    name = name,
+    controlspec = controlspec.new(-5, 5, 'lin', 0.1, 0, 'v'),
+    action = function(val)
+      send(1, id .. '(' .. val .. ')')
+      send(2, id .. '(' .. val .. ')')
+    end,
+  }
+end
+
+local patch_params = {1, 2, 3, 4, 5, 6, 9, 10}
+
+local function patch_param(i)
+  params:add{
+    type = 'option',
+    id = 'wsyn_patch' .. i,
+    name = 'patch ' .. i,
+    options = {
+      'ramp', 'curve', 'fm envelope', 'fm index', 'lpg time', 'lpg symmetry',
+      'numerator', 'denominator',
+    },
+    default = i,
+    action = function(val)
+      local p = patch_params[val]
+      send(1, 'patch(' .. i .. ',' .. p .. ')')
+      send(2, 'patch(' .. i .. ',' .. p .. ')')
+    end,
+  }
+end
+
+function WSyn.init_params()
+  params:add_separator('wsyn')
 
   params:add{
     type = 'option',
-    id = 'wsyn' .. i .. '_ar_mode',
+    id = 'wsyn_ar_mode',
     name = 'ar mode',
     options = {'off', 'on'},
     action = function(val)
-      send(i, 'ar_mode(' .. (val - 1) .. ')')
+      send(1, 'ar_mode(' .. (val - 1) .. ')')
+      send(2, 'ar_mode(' .. (val - 1) .. ')')
     end,
   }
 
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_curve',
-    name = 'curve',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'curve(' .. val .. ')')
-    end,
-  }
+  param_v('curve')
+  param_v('ramp')
+  param_v('fm_index', 'fm index')
+  param_v('fm_env', 'fm envelope')
 
   params:add{
     type = 'control',
-    id = 'wsyn' .. i .. '_ramp',
-    name = 'ramp',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'ramp(' .. val .. ')')
-    end,
-  }
-
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_fm_index',
-    name = 'fm index',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'fm_index(' .. val .. ')')
-    end,
-  }
-
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_fm_env',
-    name = 'fm env',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'fm_env(' .. val .. ')')
-    end,
-  }
-
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_fm_ratio_num',
+    id = 'wsyn_fm_ratio_num',
     name = 'fm ratio numerator',
     controlspec = controlspec.new(1, 20, 'lin', 1, 1),
     action = function(val)
-      local denom = params:get('wsyn' .. i .. '_fm_ratio_den')
-      send(i, 'fm_ratio(' .. val .. ',' .. denom .. ')')
+      local denom = params:get('wsyn_fm_ratio_den')
+      send(1, 'fm_ratio(' .. val .. ',' .. denom .. ')')
+      send(2, 'fm_ratio(' .. val .. ',' .. denom .. ')')
     end,
   }
 
   params:add{
     type = 'control',
-    id = 'wsyn' .. i .. '_fm_ratio_den',
+    id = 'wsyn_fm_ratio_den',
     name = 'fm ratio denominator',
     controlspec = controlspec.new(1, 20, 'lin', 1, 1),
     action = function(val)
-      local num = params:get('wsyn' .. i .. '_fm_ratio_num')
-      send(i, 'fm_ratio(' .. num .. ',' .. val .. ')')
+      local num = params:get('wsyn_fm_ratio_num')
+      send(1, 'fm_ratio(' .. num .. ',' .. val .. ')')
+      send(2, 'fm_ratio(' .. num .. ',' .. val .. ')')
     end,
   }
 
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_lpg_time',
-    name = 'lpg time',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'lpg_time(' .. val .. ')')
-    end,
-  }
+  param_v('lpg_time', 'lpg time')
+  param_v('lpg_symmetry', 'lpg symmetry')
 
-  params:add{
-    type = 'control',
-    id = 'wsyn' .. i .. '_lpg_symmetry',
-    name = 'lpg symmetry',
-    controlspec = controlspec.new(-5, 5, 'lin', 0, 0, 'v'),
-    action = function(val)
-      send(i, 'lpg_symmetry(' .. val .. ')')
-    end,
-  }
+  patch_param(1)
+  patch_param(2)
 end
 
 --[[
@@ -125,8 +113,6 @@ function WSyn:_init()
   self:all_voices_off()
 end
 
--- Common interface ////////////////////////////////////////////////////////////
-
 function WSyn:cleanup()
   self:all_voices_off()
 end
@@ -141,83 +127,6 @@ end
 
 function WSyn:voice_off(index, note_v)
   self:_ii("play_voice(" .. index .. "," .. note_v .. ",0)")
-end
-
-function WSyn:pitchbend(volts)
-  self:voice_pitchbend(0, volts)
-end
-
-function WSyn:voice_pitchbend(index, volts)
-  self:_ii("pitch(" .. index .. "," .. volts .. ")")
-end
-
--- WSyn-specific interface /////////////////////////////////////////////////////
-
---[[
-    @param enabled true to enable attack-release mode, false to return to
-                   attack-sustain-release mode
-]]
-function WSyn:ar_mode(enabled)
-  local mode = enabled and 1 or 0
-  self:_ii("ar_mode(" .. mode .. ")")
-end
-
---[[
-    @param volts -5=square, 0=triangle, 5=sine
-]]
-function WSyn:curve(volts)
-  self:_ii("curve(" .. volts .. ")")
-end
-
---[[
-    @param volts -5=rampwave, 0=triangle, 5=sawtooth
-]]
-function WSyn:ramp(volts)
-  self:_ii("ramp(" .. volts .. ")")
-end
-
---[[
-    @param volts -5=negative, 0=minimum, 5=maximum
-]]
-function WSyn:fm_index(volts)
-  self:_ii("fm_index(" .. volts .. ")")
-end
-
---[[
-    @param volts amount of vactrol envelope applied to fm index, -5 to +5
-]]
-function WSyn:fm_env(volts)
-  self:_ii("fm_env(" .. volts .. ")")
-end
-
---[[
-    @param numerator   FM modulator amount (0-??)
-    @param denominator FM carrier amount (0-??)
-]]
-function WSyn:fm_ratio(numerator, denominator)
-  self:_ii("fm_ratio(" .. numerator .. "," .. denominator .. ")")
-end
-
---[[
-    @param volts -5=drones, 0=vtl5c3, 5=blits
-]]
-function WSyn:lpg_time(volts)
-  self:_ii("lpg_time(" .. volts .. ")")
-end
-
---[[
-    @param volts -5=fastest attack, 5=long swells
-]]
-function WSyn:lpg_symmetry(volts)
-  self:_ii("lpg_symmetry(" .. volts .. ")")
-end
-
---[[
-    @param jack
-    @param param
-]]
-function WSyn:patch(jack, param)
-  self:_ii("patch(" .. jack .. "," .. param .. ")")
 end
 
 return WSyn
