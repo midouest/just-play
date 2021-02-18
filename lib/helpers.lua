@@ -6,6 +6,10 @@ function Helpers.n2v(n)
   return n / 12
 end
 
+function Helpers.v2n(v)
+  return 12 * v
+end
+
 -- Convert a MIDI CC value to v/oct
 -- @param cc MIDI CC value (0-127)
 function Helpers.cc2v(cc)

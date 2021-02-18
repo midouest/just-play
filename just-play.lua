@@ -39,7 +39,12 @@ function init()
     on_event = midi_to_synth,
   }
   GridControl.init {on_key = grid_to_synth}
-  CrowControl.init()
+  CrowControl.init {
+    on_input1 = function(v)
+      local semi = Helpers.v2n(v)
+      s:transpose(semi)
+    end,
+  }
 
   JustFriends.init_params()
   WSyn.init_params()

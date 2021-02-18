@@ -4,7 +4,12 @@ local note_offset_v = 0
 local velocity_offset_v = 0
 local cc_offset_v = 0
 
-function CrowControl.init()
+function CrowControl.init(options)
+  crow.input[1].mode('stream', 0.01)
+  crow.input[1].stream = function(v)
+    options.on_input1(v)
+  end
+
   crow.output[1].action = "pulse(0.005, 10)"
 
   CrowControl.init_params()

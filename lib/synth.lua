@@ -13,6 +13,8 @@ function Synth.new(moduleCls, count)
   return setmetatable({
     _voice = VoiceControl.new(unison and 1 or count, moduleCls.NUM_VOICES),
     _modules = modules,
+    _transpose = 0,
+    _pitchbend = 0,
   }, Synth)
 end
 
@@ -36,11 +38,20 @@ function Synth:note_off(id, note)
   self._modules[module]:voice_off(voice, note_v)
 end
 
+function Synth:transpose(semi)
+  self._transpose = Helpers.n2v(semi)
+  self:_apply_pitchbend()
+end
+
 function Synth:pitchbend(semi)
-  local semi_v = Helpers.n2v(semi)
+  self._pitchbend = Helpers.n2v(semi)
+  self:_apply_pitchbend()
+end
+
+function Synth:_apply_pitchbend()
   for _, module in ipairs(self._modules) do
     if module.pitchbend then
-      module:pitchbend(semi_v)
+      module:pitchbend(self._transpose + self._pitchbend)
     end
   end
 end
