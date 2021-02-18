@@ -5,7 +5,6 @@ local velocity_offset_v = 0
 local cc_offset_v = 0
 
 function CrowControl.init(options)
-  crow.input[1].mode('stream', 0.01)
   crow.input[1].stream = function(v)
     options.on_input1(v)
   end
@@ -45,6 +44,20 @@ function CrowControl.init_params()
     options = {"0-10V", "+/-5V"},
     actions = function(val)
       cc_offset_v = val and 0 or -5
+    end,
+  }
+
+  params:add{
+    type = 'option',
+    id = 'crow_pitch_in',
+    name = 'pitch in',
+    options = {"off", "on"},
+    action = function(val)
+      if val == 1 then
+        crow.input[1].mode('none')
+      else
+        crow.input[1].mode('stream', 0.01)
+      end
     end,
   }
 end
