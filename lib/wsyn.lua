@@ -96,7 +96,7 @@ end
     Create a new reference to a W/ module connected via crow and i2c
 ]]
 function WSyn.new(index)
-  local ws = setmetatable({_index = index}, WSyn)
+  local ws = setmetatable({_index = index, _pitches = {}}, WSyn)
   ws:_init()
   return ws
 end
@@ -119,14 +119,23 @@ end
 
 function WSyn:all_voices_off()
   self:_ii("play_voice(0, 0, 0)")
+  self._pitches = {}
 end
 
 function WSyn:voice_on(index, note_v, vel_v)
   self:_ii("play_voice(" .. index .. "," .. note_v .. "," .. vel_v .. ")")
+  self._pitches[index] = note_v
 end
 
 function WSyn:voice_off(index, note_v)
   self:_ii("play_voice(" .. index .. "," .. note_v .. ",0)")
+  self._pitches[index] = nil
+end
+
+function WSyn:pitchbend(volts)
+  for index, base in pairs(self._pitches) do
+    self:_ii("pitch(" .. index .. "," .. base + volts .. ")")
+  end
 end
 
 return WSyn

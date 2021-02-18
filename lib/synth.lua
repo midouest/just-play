@@ -50,9 +50,7 @@ end
 
 function Synth:_apply_pitchbend()
   for _, module in ipairs(self._modules) do
-    if module.pitchbend then
-      module:pitchbend(self._transpose + self._pitchbend)
-    end
+    module:pitchbend(self._transpose + self._pitchbend)
   end
 end
 
