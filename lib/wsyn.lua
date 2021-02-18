@@ -26,21 +26,18 @@ local function param_v(id, name)
   }
 end
 
-local patch_params = {1, 2, 3, 4, 5, 6, 9, 10}
-
-local function patch_param(i)
+local function patch_param(i, name)
   params:add{
     type = 'option',
     id = 'wsyn_patch' .. i,
-    name = 'patch ' .. i,
+    name = 'patch ' .. name,
     options = {
-      'ramp', 'curve', 'fm envelope', 'fm index', 'lpg time', 'lpg symmetry',
-      'numerator', 'denominator',
+      'ramp', 'curve', 'fm envelope', 'fm index', 'gate', 'v8', 'lpg time',
+      'lpg symmetry', 'numerator', 'denominator',
     },
     default = i,
     action = function(val)
-      local p = patch_params[val]
-      send_both('patch(' .. i .. ',' .. p .. ')')
+      send_both('patch(' .. i .. ',' .. val .. ')')
     end,
   }
 end
@@ -88,8 +85,19 @@ function WSyn.init_params()
   param_v('lpg_time', 'lpg time')
   param_v('lpg_symmetry', 'lpg symmetry')
 
-  patch_param(1)
-  patch_param(2)
+  patch_param(1, 'this')
+  patch_param(2, 'that')
+
+  params:add{
+    type = 'option',
+    id = 'wsyn_patch3',
+    name = 'patch in (ac-coupled)',
+    options = {'ramp', 'curve', 'trigger'},
+    default = 3,
+    action = function(val)
+      send_both('patch(3,' .. val .. ')')
+    end,
+  }
 end
 
 --[[
