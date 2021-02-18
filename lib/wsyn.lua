@@ -8,6 +8,11 @@ local function send(i, cmd)
   crow.send('ii.wsyn[' .. i .. '].' .. cmd)
 end
 
+local function send_both(cmd)
+  send(1, cmd)
+  send(2, cmd)
+end
+
 local function param_v(id, name)
   local name = name or id
   params:add{
@@ -16,8 +21,7 @@ local function param_v(id, name)
     name = name,
     controlspec = controlspec.new(-5, 5, 'lin', 0.1, 0, 'v'),
     action = function(val)
-      send(1, id .. '(' .. val .. ')')
-      send(2, id .. '(' .. val .. ')')
+      send_both(id .. '(' .. val .. ')')
     end,
   }
 end
@@ -36,8 +40,7 @@ local function patch_param(i)
     default = i,
     action = function(val)
       local p = patch_params[val]
-      send(1, 'patch(' .. i .. ',' .. p .. ')')
-      send(2, 'patch(' .. i .. ',' .. p .. ')')
+      send_both('patch(' .. i .. ',' .. p .. ')')
     end,
   }
 end
@@ -51,8 +54,7 @@ function WSyn.init_params()
     name = 'ar mode',
     options = {'off', 'on'},
     action = function(val)
-      send(1, 'ar_mode(' .. (val - 1) .. ')')
-      send(2, 'ar_mode(' .. (val - 1) .. ')')
+      send_both('ar_mode(' .. (val - 1) .. ')')
     end,
   }
 
@@ -68,8 +70,7 @@ function WSyn.init_params()
     controlspec = controlspec.new(1, 20, 'lin', 1, 1),
     action = function(val)
       local denom = params:get('wsyn_fm_ratio_den')
-      send(1, 'fm_ratio(' .. val .. ',' .. denom .. ')')
-      send(2, 'fm_ratio(' .. val .. ',' .. denom .. ')')
+      send_both('fm_ratio(' .. val .. ',' .. denom .. ')')
     end,
   }
 
@@ -80,8 +81,7 @@ function WSyn.init_params()
     controlspec = controlspec.new(1, 20, 'lin', 1, 1),
     action = function(val)
       local num = params:get('wsyn_fm_ratio_num')
-      send(1, 'fm_ratio(' .. num .. ',' .. val .. ')')
-      send(2, 'fm_ratio(' .. num .. ',' .. val .. ')')
+      send_both('fm_ratio(' .. num .. ',' .. val .. ')')
     end,
   }
 
