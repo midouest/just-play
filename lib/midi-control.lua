@@ -4,16 +4,21 @@ local event_callback
 local device
 
 function MidiControl.init(options)
+  local device_names = {}
+  for i = 1, #midi.vports do
+    local dev = midi.connect(i)
+    table.insert(device_names, dev.name)
+  end
+
   event_callback = options.on_event
 
   params:add_separator("midi")
 
   params:add{
-    type = "number",
+    type = "option",
     id = "midi_device",
     name = "device",
-    min = 1,
-    max = 4,
+    options = device_names,
     default = 1,
     action = function(val)
       options.on_device(val)
