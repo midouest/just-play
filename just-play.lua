@@ -1,6 +1,6 @@
 -- just-play
 -- play just friends with MIDI
--- v2.2.1 @midouest
+-- v2.2.2 @midouest
 CrowControl = include("lib/crow-control")
 GridControl = include("lib/grid-control")
 Helpers = include("lib/helpers")
