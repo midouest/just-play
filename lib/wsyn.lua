@@ -35,7 +35,7 @@ local function patch_param(i, name, default)
     name = 'patch ' .. name,
     options = {
       'ramp', 'curve', 'fm envelope', 'fm index', 'lpg time',
-      'gate', 'v8', 'lpg symmetry', 'numerator', 'denominator',
+      'lpg symmetry', 'gate', 'v8', 'numerator', 'denominator',
     },
     default = default,
     action = function(val)
