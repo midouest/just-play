@@ -18,6 +18,13 @@ function VoiceControl:_module(id)
   return (id - 1) // self._num_voices + 1
 end
 
+function VoiceControl:is_active()
+  for _ in pairs(self._voice.pairings) do
+    return true
+  end
+  return false
+end
+
 function VoiceControl:note_on(id)
   local slot = self._voice:get()
   self._voice:push(id, slot)

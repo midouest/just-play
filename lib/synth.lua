@@ -36,7 +36,9 @@ function Synth:note_off(id, note)
   local note_v = Helpers.n2v(note) - 5
   local module, voice = self._voice:note_off(id)
   self._modules[module]:voice_off(voice, note_v)
-  CrowControl.note_off()
+  if not self._voice:is_active() then
+    CrowControl.note_off()
+  end
 end
 
 function Synth:transpose(semi)
