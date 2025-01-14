@@ -13,29 +13,31 @@ local function send_both(cmd)
   send(2, cmd)
 end
 
-local function param_v(id, name)
+local function param_v(id, name, default)
   local name = name or id
+  local default = default or 0
   params:add{
     type = 'control',
     id = 'wsyn_' .. id,
     name = name,
-    controlspec = controlspec.new(-5, 5, 'lin', 0.1, 0, 'v'),
+    controlspec = controlspec.new(-5, 5, 'lin', 0.1, default, 'v'),
     action = function(val)
       send_both(id .. '(' .. val .. ')')
     end,
   }
 end
 
-local function patch_param(i, name)
+local function patch_param(i, name, default)
+  local default = default or i
   params:add{
     type = 'option',
     id = 'wsyn_patch' .. i,
     name = 'patch ' .. name,
     options = {
-      'ramp', 'curve', 'fm envelope', 'fm index', 'gate', 'v8', 'lpg time',
-      'lpg symmetry', 'numerator', 'denominator',
+      'ramp', 'curve', 'fm envelope', 'fm index', 'lpg time',
+      'gate', 'v8', 'lpg symmetry', 'numerator', 'denominator',
     },
-    default = i,
+    default = default,
     action = function(val)
       send_both('patch(' .. i .. ',' .. val .. ')')
     end,
@@ -85,19 +87,8 @@ function WSyn.init_params()
   param_v('lpg_time', 'lpg time')
   param_v('lpg_symmetry', 'lpg symmetry')
 
-  patch_param(1, 'this')
-  patch_param(2, 'that')
-
-  params:add{
-    type = 'option',
-    id = 'wsyn_patch3',
-    name = 'patch in (ac-coupled)',
-    options = {'ramp', 'curve', 'trigger'},
-    default = 3,
-    action = function(val)
-      send_both('patch(3,' .. val .. ')')
-    end,
-  }
+  patch_param(1, 'this', 7)
+  patch_param(2, 'that', 8)
 end
 
 --[[
