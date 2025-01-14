@@ -49,7 +49,7 @@ function init()
   JustFriends.init_params()
   WSyn.init_params()
 
-  params:bang()
+  params:default()
 
   redraw()
 end
