@@ -76,7 +76,7 @@ function CrowControl.init_params()
 end
 
 function CrowControl.note_on(note_v, vel_v)
-  if params:get("crow_gate") == 1 then
+  if params:get("crow_gate_out") == 1 then
     crow.output[1].volts = 10
   else
     crow.output[1]()
@@ -86,7 +86,7 @@ function CrowControl.note_on(note_v, vel_v)
 end
 
 function CrowControl.note_off()
-  if params:get("crow_gate") == 1 then
+  if params:get("crow_gate_out") == 1 then
     crow.output[1].volts = 0
   end
 end
