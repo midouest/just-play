@@ -60,12 +60,35 @@ function CrowControl.init_params()
       end
     end,
   }
+
+  params:add{
+    type='option',
+    id = 'crow_gate_out',
+    name = 'gate out',
+    options = {'gate', 'trig'},
+    action = function(val)
+      crow.output[1].volts = 0
+      if val == 2 then
+        crow.output[1].action = "pulse(0.005, 10)"
+      end
+    end
+  }
 end
 
 function CrowControl.note_on(note_v, vel_v)
-  crow.output[1]()
+  if params:get("crow_gate") == 1 then
+    crow.output[1].volts = 10
+  else
+    crow.output[1]()
+  end
   crow.output[2].volts = note_v + note_offset_v
   crow.output[3].volts = vel_v + velocity_offset_v
+end
+
+function CrowControl.note_off()
+  if params:get("crow_gate") == 1 then
+    crow.output[1].volts = 0
+  end
 end
 
 function CrowControl.cc(cc_v)
