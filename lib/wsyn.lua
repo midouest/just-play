@@ -85,7 +85,7 @@ function WSyn.init_params()
   }
 
   param_v('lpg_time', 'lpg time')
-  param_v('lpg_symmetry', 'lpg symmetry')
+  param_v('lpg_symmetry', 'lpg symmetry', -5)
 
   patch_param(1, 'this', 7)
   patch_param(2, 'that', 8)
