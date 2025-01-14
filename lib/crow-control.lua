@@ -5,16 +5,10 @@ local velocity_offset_v = 0
 local cc_offset_v = 0
 
 function CrowControl.init(options)
-  crow.input[1].stream = function(v)
-    options.on_input1(v)
-  end
-
-  crow.output[1].action = "pulse(0.005, 10)"
-
-  CrowControl.init_params()
+  CrowControl.init_params(options)
 end
 
-function CrowControl.init_params()
+function CrowControl.init_params(options)
   params:add_separator("crow")
 
   params:add{
@@ -57,6 +51,9 @@ function CrowControl.init_params()
         crow.input[1].mode('none')
       else
         crow.input[1].mode('stream', 0.01)
+        crow.input[1].stream = function(v)
+          options.on_input1(v)
+        end
       end
     end,
   }
